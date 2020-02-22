@@ -6,40 +6,71 @@ use App\Http\Controllers\Controller;
 use App\User; 
 use Illuminate\Support\Facades\Auth; 
 use Validator;
-
+use App\Http\Resources\UserResource as UserResource;
+use Lcobucci\JWT\Parser;
+use DB;
 class AuthController extends Controller
 {
 	public $successStatus = 200;
 	  
-	 public function register(Request $request) {    
-	 $validator = Validator::make($request->all(), 
-				  [ 
-				  'name' => 'required',
-				  'email' => 'required|email',
-				  'password' => 'required',  
-				  'c_password' => 'required|same:password', 
-				 ]);   
-	 if ($validator->fails()) {          
-		   return response()->json(['error'=>$validator->errors()], 401);                        }    
+    public function __construct()
+    {
+        $this->middleware('guest')->except('logout');
+    }	  
+	public function register(Request $request) {    
+		$validator = Validator::make($request->all(), 
+		[ 
+			'name' => 'required|string|max:255',
+			'email' => 'required|string|email|max:255|unique:users',
+			'password' => 'required|string|min:6',
+		  'confirm_password' => 'required|same:password', 
+		]);   
+		if ($validator->fails()){     
+		   return response()->json(['error'=>$validator->errors()], 401);
+		}    
 	 $input = $request->all();  
 	 $input['password'] = bcrypt($input['password']);
 	 $user = User::create($input); 
 	 
-	 $user['token'] =  $user->createToken('AppName')->accessToken;
-	 return response()->json(['success'=>$user], $this->successStatus); 
+	 $user['token'] =  $user->createToken('Laravel Password Grant Client')->accessToken;
+	 
+	 return response()->json(['success'=>new UserResource($user) , 'code'=>$this-> successStatus]); 
 	}
 	  
 	   
-	public function login(){ 
-	if(Auth::attempt(['email' => request('email'), 'password' => request('password')])){ 
-	   $user = Auth::user(); 
-	   $success['token'] =  $user->createToken('AppName')-> accessToken; 
-		return response()->json(['success' => $success], $this-> successStatus); 
-	  } else{ 
-	   return response()->json(['error'=>'Unauthorised'], 401); 
-	   } 
+	public function login(Request $request) {    
+		$validator = Validator::make($request->all(), 
+		[ 
+			'email' => 'required|string|email|max:255',
+			'password' => 'required|string|min:6',
+		]);   
+		if ($validator->fails()){     
+		   return response()->json(['error'=>$validator->errors()], 401);
+		}
+		
+
+		
+		if(Auth::attempt(['email' => request('email'), 'password' => request('password')])){ 
+			$user = Auth::user(); 
+			// print_r($user);
+			// return;
+			$user['token'] =  $user->createToken('Laravel Password Grant Client')-> accessToken; 
+			return response()->json(['success' => new UserResource($user) , 'code'=>$this-> successStatus]); 
+		} else{ 
+			return response()->json(['error'=>'Unauthorised'], 401); 
+		} 
 	}
-	  
+public function logout(Request $request) {
+   
+    $value = $request->bearerToken();
+ 
+        $id = (new Parser())->parse($value)->getHeader('jti');
+		$token = $request->user()->tokens->find($id);
+        $token->revoke();
+    // Auth::logout();
+    return Response(['code' => 200, 'message' => 'You are successfully logged out'], 200);
+}
+	
 	public function getUser() {
 	 $user = Auth::user();
 	 return response()->json(['success' => $user], $this->successStatus); 
