@@ -11,6 +11,10 @@
 |
 */
 
-Route::get('/', function () {
+Route::post('/', 'WelcomeController@index')->name('welcome');
+
+Route::get('{slug}', function() {
     return view('welcome');
-});
+})
+->where('slug', '(?!api)([A-z\d-\/_.]+)?');
+

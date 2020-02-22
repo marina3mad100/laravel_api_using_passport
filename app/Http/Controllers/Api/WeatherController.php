@@ -17,6 +17,10 @@ class WeatherController extends Controller
 	protected $url = 'https://www.metaweather.com/api/location/';
     protected $client;
 
+	public function weatherpage(){
+		return view('weatherpage');
+	}
+
     public function __construct()
     {
         $this->client = new Client([
