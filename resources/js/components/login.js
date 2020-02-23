@@ -94,9 +94,7 @@ class Login extends Component {
                                                     Login
                                                 </button>
 
-                                                <li className="btn btn-link">
-                                                    <Link to = "forgotpassword">Forgot Your Password?</Link>
-                                                </li>
+                                               
                                             </div>
                                         </div>
                                     </form>
