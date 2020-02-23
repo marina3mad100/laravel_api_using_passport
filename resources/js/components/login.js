@@ -11,21 +11,36 @@ class Login extends Component {
         this.state = {
             email : '',
             password: '',
+			token:''
         }
      }
 
      onSubmit(e){
         e.preventDefault();
-        const {email , password} = this.state ;
+        const {email , password ,token} = this.state ;
+		
+		
+		
         axios.post('api/v1/login', {
             email, 
             password
-          })
-          .then(response=> {
-            this.setState({err: false});
-            this.props.history.push("weatherpage") ;
+        })
+			.then(response=> {
+			   // this.token = response.data.token;
+				localStorage.setItem('token', response.data.token);
+				window.axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('token');			   
+
+				this.setState({err: false,
+				token : response.data.token
+			});
+			
+				localStorage.setItem("authToken", token);
+				axios.defaults.headers.common["Authorization"] =
+				  "Bearer " + token; 		
+			
+				this.props.history.push("weather") ;
             
-          })
+			})
           .catch(error=> {
             this.refs.email.value="";
             this.refs.password.value="";
@@ -39,7 +54,8 @@ class Login extends Component {
      }
 
 	render() {
-        
+        const {email , password ,token} = this.state ;
+
         let error = this.state.err ;
         let msg = (!error) ? 'Login Successful' : 'Wrong Credentials' ;
         let name = (!error) ? 'alert alert-success' : 'alert alert-danger' ;
@@ -57,7 +73,7 @@ class Login extends Component {
                                     </div>  
                                     <form className="form-horizontal" role="form" method="POST" onSubmit= {this.onSubmit.bind(this)}>
                                         <div className="form-group">
-                                            <label for="email" className="col-md-4 control-label">E-Mail Address</label>
+                                            <label htmlFor="email" className="col-md-4 control-label">E-Mail Address</label>
 
                                             <div className="col-md-6">
                                                 <input id="email" type="email" ref="email" className="form-control" name="email"  onChange={this.onChange.bind(this)} required />
@@ -65,22 +81,12 @@ class Login extends Component {
                                         </div>
 
                                         <div className="form-group">
-                                            <label for="password" className="col-md-4 control-label">Password</label>
+                                            <label htmlFor="password" className="col-md-4 control-label">Password</label>
 
                                             <div className="col-md-6">
                                                 <input id="password" type="password" ref="password" className="form-control" name="password"  onChange={this.onChange.bind(this)}  required />
                                             </div>
-                                        </div>
-
-                                        <div className="form-group">
-                                            <div className="col-md-6 col-md-offset-4">
-                                                <div className="checkbox">
-                                                    <label>
-                                                        <input type="checkbox" name="remember" /> Remember Me
-                                                    </label>
-                                                </div>
-                                            </div>
-                                        </div>
+                                        </div>                                
 
                                         <div className="form-group">
                                             <div className="col-md-8 col-md-offset-4">

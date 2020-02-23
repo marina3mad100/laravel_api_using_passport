@@ -28,13 +28,14 @@ class AuthController extends Controller
 		if ($validator->fails()){     
 		   return response()->json(['error'=>$validator->errors()], 401);
 		}    
-	 $input = $request->all();  
-	 $input['password'] = bcrypt($input['password']);
-	 $user = User::create($input); 
-	 
-	 $user['token'] =  $user->createToken('Laravel Password Grant Client')->accessToken;
-	 
-	 return response()->json(['success'=>new UserResource($user) , 'code'=>$this-> successStatus]); 
+		$input = $request->all();  
+		$input['password'] = bcrypt($input['password']);
+		$user = User::create($input); 	 
+		return response()->json([
+			'user'  =>  $user, // <- we're sending the user info for frontend usage
+			'token' =>  $user->createToken('authToken')->accessToken // <- token is generated and sent back to the front end
+		]);		 
+	// return response()->json(['success'=>new UserResource($user) , 'code'=>$this-> successStatus]); 
 	}
 	  
 	   
@@ -46,34 +47,27 @@ class AuthController extends Controller
 		]);   
 		if ($validator->fails()){     
 		   return response()->json(['error'=>$validator->errors()], 401);
-		}
-		
-
-		
+		}		
 		if(Auth::attempt(['email' => request('email'), 'password' => request('password')])){ 
-			$user = Auth::user(); 
-			// print_r($user);
-			// return;
-			$user['token'] =  $user->createToken('Laravel Password Grant Client')-> accessToken; 
-			return response()->json(['success' => new UserResource($user) , 'code'=>$this-> successStatus]); 
+			$user = Auth::user(); 			
+			return response()->json([
+                'user'  =>  $user, // <- we're sending the user info for frontend usage
+                'token' =>  $user->createToken('authToken')->accessToken // <- token is generated and sent back to the front end
+            ]);			
+			
+			// return response()->json([new UserResource($user) ]); 
 		} else{ 
 			return response()->json(['error'=>'Unauthorised'], 401); 
 		} 
 	}
-public function logout(Request $request) {
+	public function logout(Request $request) {
    
-    $value = $request->bearerToken();
- 
+		$value = $request->bearerToken();
         $id = (new Parser())->parse($value)->getHeader('jti');
 		$token = $request->user()->tokens->find($id);
-        $token->revoke();
-    // Auth::logout();
-    return Response(['code' => 200, 'message' => 'You are successfully logged out'], 200);
-}
+        $token->revoke();	
+		return Response(['code' => 200, 'message' => 'You are successfully logged out'], 200);
+	}
 	
-	public function getUser() {
-	 $user = Auth::user();
-	 return response()->json(['success' => $user], $this->successStatus); 
-	 }
- 
+
  }

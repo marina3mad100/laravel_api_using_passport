@@ -9,7 +9,7 @@ class Index extends Component {
        <div> 
           <Nav />       
           <div className="container text-center  title">
-               <h1>Laravel + React 	Basic Authentication </h1>
+               <h1>welcome in Bit68 Task </h1>
         </div> 
        </div>   
     )

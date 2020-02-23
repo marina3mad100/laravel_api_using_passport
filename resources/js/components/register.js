@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
-import { Link } from 'react-router-dom'
 import Nav from './navbar'
+import { Link } from 'react-router-dom'
 import axios from 'axios'
 
 class Register extends Component {
@@ -12,21 +12,27 @@ class Register extends Component {
             email : '',
             password: '',
             confirm_password: '',
+			token:''
         }
      }
 
     onSubmit(e){
         e.preventDefault();
-        const {name, email, password, confirm_password} = this.state ;
+        const {name, email, password, confirm_password , token} = this.state ;
         axios.post('api/v1/register', {
             name,
             email,
             password,
             confirm_password
           })
-          .then(response=> {
-           this.setState({err: false});
-           this.props.history.push("home") ;
+			.then(response=> {
+				localStorage.setItem('token', response.data.token);
+				window.axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('token');				  
+				this.setState({err: false,token : response.data.token});
+				localStorage.setItem("authToken", token);
+				axios.defaults.headers.common["Authorization"] =
+				  "Bearer " + token; 				
+				this.props.history.push("weather") ;
           })
           .catch(error=> {
             this.refs.name.value="";
