@@ -12,8 +12,20 @@ https://laravel.com/docs/5.8/passport
 
 
 1- download code
+
+
 2- composer install
+
+
 3 - php artisan migrate
+
+
 4 - php artisan passport::install
+
+
 5- npm install && npm run dev
+
+
 7 - php artisan serv
+
+
