@@ -68399,6 +68399,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _components_register__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./components/register */ "./resources/js/components/register.js");
 /* harmony import */ var _components_home__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./components/home */ "./resources/js/components/home.js");
 /* harmony import */ var _components_weather__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./components/weather */ "./resources/js/components/weather.js");
+function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
+
+function _objectWithoutProperties(source, excluded) { if (source == null) return {}; var target = _objectWithoutPropertiesLoose(source, excluded); var key, i; if (Object.getOwnPropertySymbols) { var sourceSymbolKeys = Object.getOwnPropertySymbols(source); for (i = 0; i < sourceSymbolKeys.length; i++) { key = sourceSymbolKeys[i]; if (excluded.indexOf(key) >= 0) continue; if (!Object.prototype.propertyIsEnumerable.call(source, key)) continue; target[key] = source[key]; } } return target; }
+
+function _objectWithoutPropertiesLoose(source, excluded) { if (source == null) return {}; var target = {}; var sourceKeys = Object.keys(source); var key, i; for (i = 0; i < sourceKeys.length; i++) { key = sourceKeys[i]; if (excluded.indexOf(key) >= 0) continue; target[key] = source[key]; } return target; }
+
 window.axios = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 var token = document.head.querySelector('meta[name="csrf-token"]');
@@ -68432,10 +68438,83 @@ react_dom__WEBPACK_IMPORTED_MODULE_1___default.a.render(react__WEBPACK_IMPORTED_
 }), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_2__["Route"], {
   path: "/home",
   component: _components_home__WEBPACK_IMPORTED_MODULE_6__["default"]
-}), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_2__["Route"], {
+}), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(PrivateRoute, {
   path: "/weather",
   component: _components_weather__WEBPACK_IMPORTED_MODULE_7__["default"]
 }))), document.getElementById('app'));
+var fakeAuth = {
+  isAuthenticated: false,
+  authenticate: function authenticate(cb) {
+    fakeAuth.isAuthenticated = true;
+    setTimeout(cb, 100); // fake async
+  },
+  signout: function signout(cb) {
+    fakeAuth.isAuthenticated = false;
+    setTimeout(cb, 100);
+  }
+};
+
+function AuthButton() {
+  var history = Object(react_router_dom__WEBPACK_IMPORTED_MODULE_2__["useHistory"])();
+  return fakeAuth.isAuthenticated ? react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, "Welcome!", " ", react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+    onClick: function onClick() {
+      fakeAuth.signout(function () {
+        return history.push("/");
+      });
+    }
+  }, "Sign out")) : react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, "You are not logged in.");
+} // A wrapper for <Route> that redirects to the login
+// screen if you're not yet authenticated.
+
+
+function PrivateRoute(_ref) {
+  var children = _ref.children,
+      rest = _objectWithoutProperties(_ref, ["children"]);
+
+  return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_2__["Route"], _extends({}, rest, {
+    render: function render(_ref2) {
+      var location = _ref2.location;
+      return fakeAuth.isAuthenticated ? children : react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_2__["Redirect"], {
+        to: {
+          pathname: "/Login",
+          state: {
+            from: location
+          }
+        }
+      });
+    }
+  }));
+}
+
+function PublicPage() {
+  return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h3", null, "Public");
+}
+
+function ProtectedPage() {
+  return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h3", null, "Protected");
+}
+
+function LoginPage() {
+  var history = Object(react_router_dom__WEBPACK_IMPORTED_MODULE_2__["useHistory"])();
+  var location = Object(react_router_dom__WEBPACK_IMPORTED_MODULE_2__["useLocation"])();
+
+  var _ref3 = location.state || {
+    from: {
+      pathname: "/"
+    }
+  },
+      from = _ref3.from;
+
+  var login = function login() {
+    fakeAuth.authenticate(function () {
+      history.replace(from);
+    });
+  };
+
+  return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, "You must log in to view the page at ", from.pathname), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+    onClick: login
+  }, "Log in"));
+}
 
 /***/ }),
 
@@ -68793,11 +68872,7 @@ function (_Component) {
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
         type: "submit",
         className: "btn btn-primary"
-      }, "Login"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("li", {
-        className: "btn btn-link"
-      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_2__["Link"], {
-        to: "forgotpassword"
-      }, "Forgot Your Password?")))))))))));
+      }, "Login"))))))))));
     }
   }]);
 
@@ -68906,7 +68981,7 @@ function (_Component) {
           className: "navbar-brand",
           href: "#",
           onClick: this.handleClick.bind(this)
-        }, "Basic Authentication")), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("ul", {
+        }, "Bit86 Task")), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("ul", {
           className: "nav navbar-nav navbar-right"
         }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("a", {
           className: "navbar-brand",
@@ -68925,7 +69000,7 @@ function (_Component) {
         className: "navbar-brand",
         href: "#",
         onClick: this.handleClick.bind(this)
-      }, "Basic Authentication")), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("ul", {
+      }, "Bit86 Task")), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("ul", {
         className: "nav navbar-nav navbar-right"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("li", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_1__["Link"], {
         to: "/login"

@@ -39,10 +39,8 @@ class Nav extends Component {
 	}
   
   handleClick(e){
-
     e.preventDefault();
     this.props.history.push('/');
-
   }
   render() {
 
@@ -51,7 +49,7 @@ class Nav extends Component {
         <nav className="navbar navbar-default">
           <div className="container-fluid">
               <div className="navbar-header">
-                <a className="navbar-brand" href="#" onClick={this.handleClick.bind(this)}>Basic Authentication</a>
+                <a className="navbar-brand" href="#" onClick={this.handleClick.bind(this)}>Bit86 Task</a>
               </div>
               <ul className="nav navbar-nav navbar-right">
                  <a className="navbar-brand" href="#" onClick={this.logout.bind(this)}>{this.props.link}</a>  
@@ -64,7 +62,7 @@ class Nav extends Component {
         <nav className="navbar navbar-default">
           <div className="container-fluid">
               <div className="navbar-header">
-                <a className="navbar-brand" href="#" onClick ={this.handleClick.bind(this)}>Basic Authentication</a>
+                <a className="navbar-brand" href="#" onClick ={this.handleClick.bind(this)}>Bit86 Task</a>
               </div>
               <ul className="nav navbar-nav navbar-right">
                 <li><Link to="/login">Login</Link></li>
@@ -77,5 +75,4 @@ class Nav extends Component {
   }
 
 }
-
 export default  withRouter(Nav)
